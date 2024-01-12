@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>One Drive Integration</title>
+  <script type="text/javascript" src="https://js.live.net/v7.0/OneDrive.js"></script>
+</head>
+<body>
+  <button id="OpenOneDrive" type="button">Open from OneDrive</button>
+</body>
+<script>
+   const oneDriveApplicationId = "08bfab96-dcb4-49cf-99d5-024778774b87";
+function launchOneDrivePicker() {
+  return new Promise(function(resolve, reject) {
+    var odOptions = {
+      clientId: oneDriveApplicationId,
+      action: "download",
+      multiSelect: false,
+      // openInNewWindow: false,
+      advanced: {
+        filter: "folder,.pptx, .pdf", // Show only folders and png files
+        //filter: "folder,photo" // Show only folders and photos
+        search: {
+        enabled: true
+      },
+      },
+      search: {
+        enabled: true
+      },
+      success: function(files) {
+        resolve(files);
+      },
+      cancel: function() {
+        resolve(null);
+      },
+      error: function(e) {
+        reject(e);
+      }
+    };
+
+    OneDrive.open(odOptions);
+  });
+}
+document.getElementById("OpenOneDrive").addEventListener("click", e => {
+    e.preventDefault();
+    launchOneDrivePicker()
+        .then(result => {
+            if (result) {
+                for (const file of result.value) {
+                    const name = file.name;
+                    const url = file["@microsoft.graph.downloadUrl"];
+                    console.log('here we go: ', JSON.stringify(url));
+                    console.log({ name: name, url: url });
+                }
+            }
+        }).catch(reason => {
+            console.error(reason);
+        });
+});
+</script>
+</script>
+</html>
